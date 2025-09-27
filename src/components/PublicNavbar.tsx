@@ -2,9 +2,11 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/enhanced-button";
 import { Menu, X, Calendar, Phone } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function PublicNavbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -46,10 +48,36 @@ export default function PublicNavbar() {
                 <Phone className="w-4 h-4 mr-2" />
                 (555) 123-4567
               </Button>
-              <Button size="sm" variant="medical">
-                <Calendar className="w-4 h-4 mr-2" />
-                Book Appointment
-              </Button>
+              {user ? (
+                <>
+                  <NavLink to="/admin">
+                    <Button size="sm" variant="outline">
+                      Dashboard
+                    </Button>
+                  </NavLink>
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    onClick={() => signOut()}
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <NavLink to="/auth">
+                    <Button size="sm" variant="outline">
+                      Sign In
+                    </Button>
+                  </NavLink>
+                  <NavLink to="/auth">
+                    <Button size="sm" variant="medical">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Book Appointment
+                    </Button>
+                  </NavLink>
+                </>
+              )}
             </div>
           </div>
 
@@ -88,10 +116,40 @@ export default function PublicNavbar() {
                   <Phone className="w-4 h-4 mr-2" />
                   (555) 123-4567
                 </Button>
-                <Button size="sm" variant="medical">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book Appointment
-                </Button>
+                {user ? (
+                  <>
+                    <NavLink to="/admin" onClick={() => setIsOpen(false)}>
+                      <Button size="sm" variant="outline" className="w-full">
+                        Dashboard
+                      </Button>
+                    </NavLink>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => {
+                        signOut();
+                        setIsOpen(false);
+                      }}
+                      className="w-full"
+                    >
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <NavLink to="/auth" onClick={() => setIsOpen(false)}>
+                      <Button size="sm" variant="outline" className="w-full">
+                        Sign In
+                      </Button>
+                    </NavLink>
+                    <NavLink to="/auth" onClick={() => setIsOpen(false)}>
+                      <Button size="sm" variant="medical" className="w-full">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Book Appointment
+                      </Button>
+                    </NavLink>
+                  </>
+                )}
               </div>
             </div>
           </div>

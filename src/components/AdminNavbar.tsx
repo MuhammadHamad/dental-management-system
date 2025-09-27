@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/enhanced-button";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 
 export default function AdminNavbar() {
+  const { user, signOut } = useAuth();
   const navItems = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { name: "Appointments", path: "/admin/appointments", icon: Calendar },
@@ -57,10 +59,19 @@ export default function AdminNavbar() {
               );
             })}
             
-            <Button variant="outline" size="sm">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-muted-foreground hidden sm:block">
+                Welcome, {user?.email?.split('@')[0] || 'User'}
+              </span>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => signOut()}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
           </div>
 
           {/* Mobile menu button */}
