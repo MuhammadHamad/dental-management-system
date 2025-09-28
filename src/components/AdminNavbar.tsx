@@ -1,84 +1,91 @@
-import { NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/enhanced-button";
-import { useAuth } from "@/hooks/useAuth";
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/enhanced-button';
 import { 
-  LayoutDashboard, 
-  Calendar, 
-  Users, 
-  Package, 
-  CreditCard, 
-  LogOut,
-  Menu 
-} from "lucide-react";
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { User, LogOut, Settings, Calendar } from 'lucide-react';
 
 export default function AdminNavbar() {
-  const { user, signOut } = useAuth();
-  const navItems = [
-    { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
-    { name: "Appointments", path: "/admin/appointments", icon: Calendar },
-    { name: "Patients", path: "/admin/patients", icon: Users },
-    { name: "Inventory", path: "/admin/inventory", icon: Package },
-    { name: "Transactions", path: "/admin/transactions", icon: CreditCard },
-  ];
+  const { user, userRole, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  const handleDashboard = () => {
+    if (userRole === 'admin') {
+      navigate('/admin');
+    } else if (userRole === 'patient') {
+      navigate('/patient');
+    }
+  };
 
   return (
-    <nav className="bg-card shadow-soft border-b border-border">
+    <nav className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <NavLink to="/admin" className="flex items-center space-x-3">
-            <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">D</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-semibold text-foreground">DentalCare Pro</span>
-              <span className="text-xs text-muted-foreground">Admin Dashboard</span>
-            </div>
-          </NavLink>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <NavLink
-                  key={item.name}
-                  to={item.path}
-                  end={item.path === "/admin"}
-                  className={({ isActive }) =>
-                    `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-smooth ${
-                      isActive 
-                        ? "bg-primary text-primary-foreground shadow-soft" 
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    }`
-                  }
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.name}</span>
-                </NavLink>
-              );
-            })}
+        <div className="flex justify-between h-16">
+          <div className="flex items-center space-x-8">
+            <Link to="/" className="text-xl font-bold text-primary">
+              Dental Management
+            </Link>
             
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-muted-foreground hidden sm:block">
-                Welcome, {user?.email?.split('@')[0] || 'User'}
-              </span>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => signOut()}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
-            </div>
+            {userRole === 'admin' && (
+              <div className="hidden md:flex space-x-6">
+                <Link 
+                  to="/admin" 
+                  className="text-gray-700 hover:text-primary transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  to="/admin/patients" 
+                  className="text-gray-700 hover:text-primary transition-colors"
+                >
+                  Patients
+                </Link>
+              </div>
+            )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button variant="ghost" size="sm">
-              <Menu className="w-5 h-5" />
-            </Button>
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden md:block">
+                      {user.email}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={handleDashboard}>
+                    <Calendar className="mr-2 h-4 w-4" />
+                    <span>{userRole === 'admin' ? 'Admin Dashboard' : 'My Appointments'}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth">
+                <Button>Sign In</Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

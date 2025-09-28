@@ -6,9 +6,11 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  userRole: string | null;
   signUp: (email: string, password: string, userData?: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,6 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     // Set up auth state listener
@@ -24,6 +27,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Fetch user role when user logs in
+        if (session?.user) {
+          fetchUserRole(session.user.id);
+        } else {
+          setUserRole(null);
+        }
         setLoading(false);
       }
     );
@@ -32,11 +42,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+      
+      if (data && !error) {
+        setUserRole(data.role);
+      }
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  };
 
   const signUp = async (email: string, password: string, userData?: any) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -62,6 +91,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setUserRole(null);
+  };
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+    return { error };
   };
 
   return (
@@ -69,9 +106,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       session,
       loading,
+      userRole,
       signUp,
       signIn,
-      signOut
+      signOut,
+      resetPassword
     }}>
       {children}
     </AuthContext.Provider>

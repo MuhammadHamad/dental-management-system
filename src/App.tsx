@@ -4,8 +4,12 @@ import { AuthProvider } from "./hooks/useAuth";
 import Layout from "./components/Layout";
 import Home from "./pages/public/Home";
 import Dashboard from "./pages/admin/Dashboard";
+import Patients from "./pages/admin/Patients";
+import PatientDashboard from "./pages/patient/PatientDashboard";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleBasedRoute from "./components/RoleBasedRoute";
+import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -19,11 +23,27 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            
+            {/* Patient Routes */}
+            <Route path="/patient" element={
+              <RoleBasedRoute requiredRole="patient">
+                <PatientDashboard />
+              </RoleBasedRoute>
             } />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={
+              <RoleBasedRoute requiredRole="admin">
+                <Dashboard />
+              </RoleBasedRoute>
+            } />
+            <Route path="/admin/patients" element={
+              <RoleBasedRoute requiredRole="admin">
+                <Patients />
+              </RoleBasedRoute>
+            } />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
