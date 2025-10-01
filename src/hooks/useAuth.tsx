@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { CLINIC_CONFIG } from '@/config/clinic';
 
 interface AuthContextType {
   user: User | null;
@@ -11,6 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
+  createAdminUser: (userId: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,17 +62,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
       
       if (data && !error) {
+        console.log('User role found:', data.role);
         setUserRole(data.role);
+      } else {
+        console.log('No role found for user:', userId, 'Error:', error);
+        setUserRole(null);
       }
     } catch (error) {
       console.error('Error fetching user role:', error);
+      setUserRole(null);
     }
   };
 
   const signUp = async (email: string, password: string, userData?: any) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -78,7 +85,72 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: userData
       }
     });
+
+    // If signup is successful and user is created, assign default role
+    if (data.user && !error) {
+      await assignDefaultRole(data.user.id, userData?.role || 'patient');
+    }
+    
     return { error };
+  };
+
+  const assignDefaultRole = async (userId: string, role: 'admin' | 'patient' = 'patient') => {
+    try {
+      // Check if this is the first user (make them admin)
+      const { data: existingUsers } = await supabase
+        .from('user_roles')
+        .select('id')
+        .limit(1);
+      
+      const finalRole = (existingUsers?.length === 0) ? 'admin' : role;
+      
+      console.log('Assigning role:', finalRole, 'to user:', userId);
+      
+      if (finalRole === 'admin') {
+        // Use the RLS-bypassing function for admin
+        const { data, error } = await supabase.rpc('make_user_admin', {
+          user_uuid: userId
+        });
+        
+        if (error) {
+          console.error('Error assigning admin role:', error);
+        } else {
+          console.log('Admin role assigned successfully');
+        }
+      } else {
+        // Get the clinic ID from configuration
+        const defaultClinicId = CLINIC_CONFIG.id;
+        
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: userId,
+            clinic_id: defaultClinicId,
+            role: finalRole
+          });
+
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            clinic_id: defaultClinicId,
+            email: ''
+          });
+
+        if (roleError) {
+          console.error('Error assigning patient role:', roleError);
+        }
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+        }
+      }
+
+      // Refresh the user role after assignment
+      await fetchUserRole(userId);
+      
+    } catch (error) {
+      console.error('Error in assignDefaultRole:', error);
+    }
   };
 
   const signIn = async (email: string, password: string) => {
@@ -101,6 +173,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
+  const createAdminUser = async (userId: string) => {
+    try {
+      // Use the database function that bypasses RLS
+      const { data, error } = await supabase.rpc('make_user_admin', {
+        user_uuid: userId
+      });
+
+      if (error) {
+        console.error('Error calling make_user_admin function:', error);
+        return { error };
+      }
+
+      if (!data) {
+        return { error: { message: 'Failed to assign admin role' } };
+      }
+
+      // Refresh user role
+      await fetchUserRole(userId);
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Error in createAdminUser:', error);
+      return { error };
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -110,7 +208,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       signIn,
       signOut,
-      resetPassword
+      resetPassword,
+      createAdminUser
     }}>
       {children}
     </AuthContext.Provider>

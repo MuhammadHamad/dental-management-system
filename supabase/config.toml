@@ -1,1 +1,8 @@
 project_id = "ecelipqxiqgzkvroahbq"
+
+[auth]
+# Disable email confirmation for development
+enable_confirmations = false
+# Set a simple redirect URL
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000"]

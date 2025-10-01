@@ -1,7 +1,10 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "smilecare-dental-management",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Modern dental clinic management system with appointment booking, patient management, and inventory tracking",
+  "author": "SmileCare Dental Clinic",
+  "keywords": ["dental", "clinic", "management", "appointments", "healthcare", "react", "typescript"],
   "type": "module",
   "scripts": {
     "dev": "vite",

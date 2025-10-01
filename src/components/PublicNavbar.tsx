@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/enhanced-button";
 import { Menu, X, Calendar, Phone } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function PublicNavbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,6 +45,7 @@ export default function PublicNavbar() {
             ))}
             
             <div className="flex items-center space-x-3">
+              <ThemeToggle />
               <Button variant="outline" size="sm" className="hidden lg:flex">
                 <Phone className="w-4 h-4 mr-2" />
                 (555) 123-4567
@@ -112,6 +114,10 @@ export default function PublicNavbar() {
                 </NavLink>
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                  <ThemeToggle />
+                </div>
                 <Button variant="outline" size="sm">
                   <Phone className="w-4 h-4 mr-2" />
                   (555) 123-4567

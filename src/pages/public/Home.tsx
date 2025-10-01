@@ -1,7 +1,9 @@
-import heroImage from "@/assets/dental-hero.jpg";
 import { Button } from "@/components/ui/enhanced-button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import PublicNavbar from "@/components/PublicNavbar";
+import { DentalAnimatedBackground } from "@/components/DentalAnimatedBackground";
+import { CLINIC_CONFIG } from "@/config/clinic";
 import { 
   Calendar, 
   Shield, 
@@ -11,10 +13,25 @@ import {
   MapPin, 
   Star,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  Users,
+  Heart,
+  Smile,
+  Zap
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Home() {
+  // SEO optimization
+  useEffect(() => {
+    document.title = `${CLINIC_CONFIG.name} - ${CLINIC_CONFIG.tagline}`;
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', CLINIC_CONFIG.seo.description);
+    }
+  }, []);
+
   const features = [
     {
       icon: Calendar,
@@ -65,29 +82,72 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <PublicNavbar />
       
-      {/* Hero Section */}
-      <section 
-        className="relative gradient-hero text-white py-20 px-4 bg-cover bg-center bg-blend-overlay"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      >
-        <div className="absolute inset-0 bg-primary/80"></div>
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-            Your Smile is Our Priority
+      {/* Hero Section - Exactly 100vh including navbar */}
+      <section className="relative h-screen flex items-center justify-center gradient-hero text-white px-4 overflow-hidden" style={{height: 'calc(100vh - 64px)'}}>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80"></div>
+        
+        {/* Dental Animated Background */}
+        <DentalAnimatedBackground />
+        
+        {/* Enhanced background elements for depth */}
+        <div className="absolute inset-0 z-5">
+          <div className="absolute top-20 left-10 w-24 h-24 bg-white/3 rounded-full blur-2xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-20 h-20 bg-white/2 rounded-full blur-xl animate-float" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-white/2 rounded-full blur-lg animate-float" style={{animationDelay: '2s'}}></div>
+        </div>
+        
+        {/* Text overlay for maximum readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/8 via-transparent to-black/5 z-10"></div>
+        
+        <div className="max-w-6xl mx-auto text-center relative z-30 px-4">
+          <Badge className="mb-6 bg-white/25 text-white border-white/40 animate-fade-in backdrop-blur-md shadow-lg text-sm px-4 py-2">
+            ✨ Modern Dental Excellence
+          </Badge>
+          
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in leading-tight">
+            <span className="bg-gradient-to-r from-white via-white to-blue-50 bg-clip-text text-transparent drop-shadow-xl filter brightness-110">
+              Your Perfect Smile
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-blue-50 via-white to-white bg-clip-text text-transparent drop-shadow-xl filter brightness-110">
+              Awaits
+            </span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto animate-slide-up">
-            Modern dental care with cutting-edge technology and compassionate service. 
-            Experience the difference at DentalCare Pro.
+          
+          <p className="text-lg md:text-xl lg:text-2xl mb-8 text-white max-w-3xl mx-auto animate-slide-up leading-relaxed font-medium drop-shadow-lg filter brightness-110">
+            {CLINIC_CONFIG.description}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-scale-in">
-            <Button size="lg" variant="hero">
-              <Calendar className="w-5 h-5 mr-2" />
-              Book Appointment
-            </Button>
-            <Button size="lg" variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
-              <Phone className="w-5 h-5 mr-2" />
-              Call (555) 123-4567
-            </Button>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-scale-in mb-8">
+            <NavLink to="/book-appointment">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/95 shadow-xl hover:shadow-glow transition-spring text-lg px-8 py-4 backdrop-blur-sm font-semibold border border-white/20">
+                <Calendar className="w-5 h-5 mr-2" />
+                Book Your Visit
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </NavLink>
+            <NavLink to="/contact">
+              <Button size="lg" variant="outline" className="bg-white/15 border border-white/50 text-white hover:bg-white/25 backdrop-blur-md transition-spring text-lg px-8 py-4 font-semibold shadow-lg">
+                <Phone className="w-5 h-5 mr-2" />
+                Call (555) 123-4567
+              </Button>
+            </NavLink>
+          </div>
+          
+          {/* Trust indicators with enhanced visibility */}
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 text-white animate-fade-in backdrop-blur-md bg-white/10 rounded-2xl p-4 md:p-6 border border-white/20 shadow-xl" style={{animationDelay: '0.5s'}}>
+            <div className="flex items-center gap-2">
+              <Star className="w-5 h-5 fill-yellow-400 text-yellow-400 drop-shadow-lg" />
+              <span className="text-sm md:text-base font-semibold drop-shadow-lg">4.9/5 Rating</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5 drop-shadow-lg" />
+              <span className="text-sm md:text-base font-semibold drop-shadow-lg">10,000+ Patients</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Award className="w-5 h-5 drop-shadow-lg" />
+              <span className="text-sm md:text-base font-semibold drop-shadow-lg">Award Winning</span>
+            </div>
           </div>
         </div>
       </section>
@@ -108,9 +168,9 @@ export default function Home() {
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Card key={index} className="shadow-card hover:shadow-elegant transition-smooth">
+                <Card key={index} className="gradient-card shadow-card hover:shadow-elegant transition-spring group border-0 hover:scale-105">
                   <CardHeader className="text-center">
-                    <div className="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <div className="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:shadow-glow transition-spring">
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <CardTitle className="text-xl">{feature.title}</CardTitle>
@@ -156,10 +216,12 @@ export default function Home() {
                 <CardContent>
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold text-primary">{service.price}</span>
-                    <Button variant="outline" size="sm">
-                      Learn More
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
+                    <NavLink to="/services">
+                      <Button variant="outline" size="sm">
+                        Learn More
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </NavLink>
                   </div>
                 </CardContent>
               </Card>
@@ -200,10 +262,12 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button size="lg" variant="medical" className="w-full">
-                  <Calendar className="w-5 h-5 mr-2" />
-                  Schedule Appointment
-                </Button>
+                <NavLink to="/book-appointment" className="w-full">
+                  <Button size="lg" variant="medical" className="w-full">
+                    <Calendar className="w-5 h-5 mr-2" />
+                    Schedule Appointment
+                  </Button>
+                </NavLink>
                 <div className="text-center">
                   <div className="flex justify-center items-center space-x-1 text-sm text-muted-foreground">
                     {[...Array(5)].map((_, i) => (

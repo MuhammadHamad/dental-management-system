@@ -343,22 +343,25 @@ CREATE TRIGGER update_inventory_updated_at BEFORE UPDATE ON public.inventory
 CREATE TRIGGER update_transactions_updated_at BEFORE UPDATE ON public.transactions
     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- Insert sample data for development
-INSERT INTO public.clinics (id, name, address, phone, email) VALUES 
-('123e4567-e89b-12d3-a456-426614174000', 'Bright Smiles Dental Clinic', '123 Main St, City, State 12345', '+1-555-0123', 'info@brightsmiles.com');
+-- Insert real clinic data
+INSERT INTO public.clinics (id, name, address, phone, email, website) VALUES 
+('550e8400-e29b-41d4-a716-446655440000', 'SmileCare Dental Clinic', '123 Healthcare Avenue, Lahore, Punjab 54000, Pakistan', '+92-42-1234-5678', 'info@smilecare.com', 'https://smilecare.com');
 
--- Insert sample treatments
+-- Insert real treatments with Pakistani pricing (PKR)
 INSERT INTO public.treatments (clinic_id, name, description, duration_minutes, price) VALUES 
-('123e4567-e89b-12d3-a456-426614174000', 'General Checkup', 'Routine dental examination and cleaning', 60, 120.00),
-('123e4567-e89b-12d3-a456-426614174000', 'Teeth Cleaning', 'Professional dental cleaning and polishing', 45, 80.00),
-('123e4567-e89b-12d3-a456-426614174000', 'Root Canal', 'Root canal treatment for infected tooth', 90, 450.00),
-('123e4567-e89b-12d3-a456-426614174000', 'Filling', 'Dental filling for cavity treatment', 30, 150.00),
-('123e4567-e89b-12d3-a456-426614174000', 'Tooth Extraction', 'Surgical removal of damaged tooth', 45, 200.00);
+('550e8400-e29b-41d4-a716-446655440000', 'General Consultation', 'Comprehensive dental examination and consultation', 30, 2000.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Teeth Cleaning (Scaling)', 'Professional dental cleaning and plaque removal', 45, 3500.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Dental Filling', 'Tooth-colored composite filling for cavities', 60, 4500.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Root Canal Treatment', 'Complete root canal therapy for infected teeth', 90, 15000.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Tooth Extraction', 'Simple tooth extraction procedure', 30, 3000.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Teeth Whitening', 'Professional teeth whitening treatment', 60, 8000.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Dental Crown', 'Ceramic or metal crown restoration', 120, 25000.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Dental Implant', 'Single tooth implant with crown', 180, 80000.00);
 
--- Insert sample inventory
-INSERT INTO public.inventory (clinic_id, item_name, category, current_stock, minimum_stock, unit_cost) VALUES 
-('123e4567-e89b-12d3-a456-426614174000', 'Disposable Gloves', 'Safety Equipment', 500, 50, 0.25),
-('123e4567-e89b-12d3-a456-426614174000', 'Dental Masks', 'Safety Equipment', 200, 25, 0.15),
-('123e4567-e89b-12d3-a456-426614174000', 'Composite Filling Material', 'Materials', 20, 5, 45.00),
-('123e4567-e89b-12d3-a456-426614174000', 'Local Anesthetic', 'Medications', 15, 3, 12.50),
-('123e4567-e89b-12d3-a456-426614174000', 'Dental Needles', 'Equipment', 100, 20, 2.00);
+-- Insert real inventory with Pakistani pricing (PKR)
+INSERT INTO public.inventory (clinic_id, item_name, category, brand, supplier, current_stock, minimum_stock, unit_cost) VALUES 
+('550e8400-e29b-41d4-a716-446655440000', 'Disposable Gloves (Nitrile)', 'Safety Equipment', 'MedGlove', 'Medical Supplies Co.', 500, 100, 15.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Dental Masks (3-Layer)', 'Safety Equipment', 'SafeMask', 'Medical Supplies Co.', 200, 50, 8.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Composite Filling Material', 'Dental Materials', '3M ESPE', 'Dental Supply House', 25, 5, 3500.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Local Anesthetic (Lidocaine)', 'Medications', 'Septodont', 'Pharma Distributors', 20, 5, 450.00),
+('550e8400-e29b-41d4-a716-446655440000', 'Dental Needles (27G)', 'Instruments', 'Terumo', 'Medical Equipment Ltd.', 100, 25, 25.00);
