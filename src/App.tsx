@@ -3,11 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { ThemeProvider } from "./hooks/useTheme";
 import Layout from "./components/Layout";
-import Home from "./pages/public/Home";
-import Services from "./pages/public/Services";
-import About from "./pages/public/About";
-import Contact from "./pages/public/Contact";
-import BookAppointment from "./pages/public/BookAppointment";
 import Dashboard from "./pages/admin/Dashboard";
 import Patients from "./pages/admin/Patients";
 import Appointments from "./pages/admin/Appointments";
@@ -32,11 +27,12 @@ const App = () => (
         <BrowserRouter>
         <Layout>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/book-appointment" element={<BookAppointment />} />
+            {/* Root route is now the admin dashboard */}
+            <Route path="/" element={
+              <RoleBasedRoute requiredRole="admin">
+                <Dashboard />
+              </RoleBasedRoute>
+            } />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin-setup" element={<AdminSetup />} />
             <Route path="/auth-debug" element={<AuthDebug />} />
